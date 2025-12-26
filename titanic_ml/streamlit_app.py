@@ -51,6 +51,11 @@ def main():
     # Show only original columns in the table
     display_cols = ['Name', 'Sex_display', 'Age', 'SibSp', 'Parch', 'Fare', 'Cabin', 'Embarked', 'HasCabin', 'FamilySize', 'Title', 'Survival_Prob']
     display_cols = [col for col in display_cols if col in filtered.columns]
+    # Convert Survival_Prob to percentage for display
+    if 'Survival_Prob' in filtered.columns:
+        filtered = filtered.copy()
+        filtered['Survival_Prob (%)'] = (filtered['Survival_Prob'] * 100).round(1)
+        display_cols = [col if col != 'Survival_Prob' else 'Survival_Prob (%)' for col in display_cols]
     st.write(f"Filtered Results ({len(filtered)} passengers):")
     st.dataframe(filtered[display_cols])
 

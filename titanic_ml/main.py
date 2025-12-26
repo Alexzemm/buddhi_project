@@ -60,6 +60,9 @@ def main():
             results[col] = raw_test[col]
         else:
             results[col] = raw_test[col]
+    # Ensure original Pclass is present for filtering in Streamlit
+    if 'Pclass' in raw_test.columns:
+        results['Pclass'] = raw_test['Pclass']
     # Rename encoded columns with _enc suffix
     encoded_cols = [c for c in results.columns if c not in raw_test.columns and c not in ['Survival_Prob']]
     results.rename(columns={c: c + '_enc' for c in encoded_cols}, inplace=True)
