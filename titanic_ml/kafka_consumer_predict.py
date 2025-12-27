@@ -4,7 +4,7 @@ from kafka import KafkaConsumer
 import joblib
 
 # Load the trained model
-model = joblib.load('titanic_ml/best_model.joblib')
+model = joblib.load('best_model.joblib')
 
 consumer = KafkaConsumer(
     'titanic_passengers',
@@ -15,10 +15,12 @@ consumer = KafkaConsumer(
 drop_cols = ['Name', 'Cabin', 'Ticket', 'Survived']
 
 for message in consumer:
-    data = message.value
-    df = pd.DataFrame([data])
-    # Drop columns not used in training (adjust as needed)
+    msg = message.value
+    # Expecting {'normalized': ..., 'original': ...}
+    norm_data = msg['normalized']
+    orig_data = msg['original']
+    df = pd.DataFrame([norm_data])
     X = df.drop([col for col in drop_cols if col in df.columns], axis=1, errors='ignore')
-    # Predict
     prob = model.predict_proba(X)[:, 1][0]
-    print(f"Passenger: {data} | Survival Probability: {prob:.2f}")
+    # Print original data with prediction
+    print(f"Passenger: {orig_data} | Survival Probability: {prob:.2f}")
