@@ -8,7 +8,7 @@ import threading
 import time
 
 # Load original test set for imputation values (for display)
-_orig_df = pd.read_csv('../titanic/test.csv')
+_orig_df = pd.read_csv('titanic/test.csv')
 # Compute fill values from original data
 _median_age = _orig_df['Age'].median()
 _median_fare = _orig_df['Fare'].median()
@@ -24,12 +24,13 @@ data_buffer = []
 # Function to run Kafka consumer in a thread
 def run_kafka_consumer(buffer, stop_event):
     print("[DEBUG] Kafka consumer thread started")
-    model = joblib.load('best_model.joblib')
+    model = joblib.load('titanic_ml/best_model.joblib')
     consumer = KafkaConsumer(
         'titanic_passengers',
-        bootstrap_servers='localhost:9092',
+        bootstrap_servers='kafka:9092',
         value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-        auto_offset_reset='latest'
+        auto_offset_reset='earliest',
+        group_id='streamlit-group'
     )
     drop_cols = ['Name', 'Cabin', 'Ticket', 'Survived']
     for message in consumer:
