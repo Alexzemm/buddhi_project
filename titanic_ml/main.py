@@ -8,6 +8,7 @@ from feature_engineering import add_family_size, extract_title, encode_features
 from eda import plot_survival_by_gender, plot_survival_by_pclass, plot_age_histogram, plot_survival_by_embarked, plot_pclass_vs_survival
 from modeling import split_data, train_models, evaluate_models, cross_validate_model, hyperparameter_tuning
 from prediction_utils import filter_by_pclass, filter_by_age_range, filter_by_gender, sort_by_survival_probability
+import joblib
 
 # Path to Titanic CSV (update as needed)
 data_path = os.path.join('titanic', 'train.csv')
@@ -46,6 +47,9 @@ def main():
     cross_validate_model(models['RandomForest'], X_train, y_train)
     param_grid = {'n_estimators': [100, 200], 'max_depth': [5, 10, None]}
     best_rf = hyperparameter_tuning(models['RandomForest'], param_grid, X_train, y_train)
+    # Save the best model
+    joblib.dump(best_rf, 'titanic_ml/best_model.joblib')
+    print("Best model saved as titanic_ml/best_model.joblib")
     # Prediction on test set
     y_prob = best_rf.predict_proba(X_test)[:,1]
     # Merge original values for Age, Fare, FamilySize, and Sex from the raw test set
